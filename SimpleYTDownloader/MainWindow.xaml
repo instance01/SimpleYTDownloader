@@ -1,0 +1,29 @@
+﻿<Controls:MetroWindow x:Class="SimpleYTDownloader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        Title="Simple YT Downloader" Height="350" Width="525">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Orange.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Height="320" VerticalAlignment="Top">
+        <ListBox x:Name="listbox1" HorizontalAlignment="Left" Height="242" Margin="10,10,0,0" VerticalAlignment="Top" Width="497" Drop="listbox1_dragdrop" AllowDrop="True">
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete" Click="menuitem1_click"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+        <Button Content="Download All" HorizontalAlignment="Left" Margin="412,277,0,0" VerticalAlignment="Top" Width="95" Height="33" Click="Button_Click"/>
+        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Margin="22,277,0,0" VerticalAlignment="Top" Width="373" Height="33"/>
+
+    </Grid>
+</Controls:MetroWindow>
