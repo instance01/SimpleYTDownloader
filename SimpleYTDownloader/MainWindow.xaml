@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="Simple YT Downloader" Height="350" Width="525">
+        Title="Simple YT Downloader" Height="350" Width="525" KeyDown="base_keydown">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -10,20 +10,22 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Orange.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Height="320" VerticalAlignment="Top">
-        <ListBox x:Name="listbox1" HorizontalAlignment="Left" Height="242" Margin="10,10,0,0" VerticalAlignment="Top" Width="497" Drop="listbox1_dragdrop" AllowDrop="True">
+        <ListBox x:Name="listbox1" HorizontalAlignment="Left" Height="242" Margin="10,10,0,0" VerticalAlignment="Top" Width="497" Drop="listbox1_dragdrop" AllowDrop="True" Background="White">
             <ListBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Delete" Click="menuitem1_click"/>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
-        <Button Content="Download All" HorizontalAlignment="Left" Margin="412,277,0,0" VerticalAlignment="Top" Width="95" Height="33" Click="Button_Click"/>
-        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Margin="22,277,0,0" VerticalAlignment="Top" Width="373" Height="33"/>
+        <Button Content="Download All" HorizontalAlignment="Left" Margin="412,273,0,0" VerticalAlignment="Top" Width="95" Height="33" Click="Button_Click"/>
+        <!--<ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Margin="-278,260,0,0" VerticalAlignment="Top" Width="232" Height="33" Value="59" Foreground="#FF8FFF08"/>-->
+        <Controls:ProgressRing x:Name="progressring1" HorizontalAlignment="Left" Margin="346,259,0,0" VerticalAlignment="Top" Height="43" Width="42" IsActive="False"/>
+        <Label x:Name="label1" Content="0%" HorizontalAlignment="Left" Margin="361,276,0,0" VerticalAlignment="Top" Visibility="hidden"/>
 
     </Grid>
 </Controls:MetroWindow>

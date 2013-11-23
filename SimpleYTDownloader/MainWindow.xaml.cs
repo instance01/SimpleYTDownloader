@@ -79,12 +79,16 @@ namespace SimpleYTDownloader
 
         private void Button_Click(object sender_, RoutedEventArgs e)
         {
-            progressbar1.Maximum = 100;
-            progressbar1.Minimum = 0;
+            //progressbar1.Maximum = 100;
+            //progressbar1.Minimum = 0;
             int count = listbox1.Items.Count;
+
             foreach (string i in listbox1.Items)
             {
                 string link = i;
+
+                progressring1.IsActive = true;
+                label1.Visibility = System.Windows.Visibility.Visible;
 
                 Thread t = new Thread(() => downloadVideo(link, count));
                 t.Start();
@@ -103,18 +107,36 @@ namespace SimpleYTDownloader
 
             var audioDownloader = new AudioDownloader(video, Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + "/" + video.Title + video.AudioExtension);
 
-            audioDownloader.DownloadProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => progressbar1.Value = args.ProgressPercentage / count)); // * 0.85
-            audioDownloader.AudioExtractionProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => progressbar1.Value = args.ProgressPercentage * 0.15));
+            //audioDownloader.DownloadProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => progressbar1.Value = args.ProgressPercentage / count));
+            //audioDownloader.AudioExtractionProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => progressbar1.Value = args.ProgressPercentage * 0.15));
+            audioDownloader.DownloadProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => label1.Content = Convert.ToString(args.ProgressPercentage / count) + "%"));
+            audioDownloader.AudioExtractionProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => label1.Content = Convert.ToString(args.ProgressPercentage / count) + "%"));
             audioDownloader.DownloadFinished += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() =>
             {
-
-                progressbar1.Value = 0;
+                label1.Visibility = System.Windows.Visibility.Hidden;
+                label1.Content = "0%";
+                progressring1.IsActive = false;
+                //progressbar1.Value = 0;
                 listbox1.Items.Remove(link);
 
             }));
 
 
             audioDownloader.Execute();
+        }
+
+        private void base_keydown(object sender, KeyEventArgs e)
+        {
+            // ctrl + v
+            if (e.Key == Key.V && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                if (Clipboard.ContainsData(DataFormats.Text) || Clipboard.ContainsData(DataFormats.UnicodeText) || Clipboard.ContainsData(DataFormats.OemText))
+                {
+                    listbox1.Items.Add(Clipboard.GetText());
+                }
+
+                e.Handled = true;
+            }
         }
     }
 }
