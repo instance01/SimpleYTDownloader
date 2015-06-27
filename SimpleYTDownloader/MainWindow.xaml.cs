@@ -16,6 +16,7 @@ using MahApps.Metro;
 using YoutubeExtractor;
 using System.Threading;
 using System.ComponentModel;
+using System.Timers;
 
 namespace SimpleYTDownloader
 {
@@ -60,119 +61,112 @@ namespace SimpleYTDownloader
         {
             if (listbox1.SelectedIndex != -1)
             {
+                Video video = listbox1.Items.GetItemAt(listbox1.SelectedIndex) as Video;
+                Videos.Remove(video);
                 listbox1.Items.RemoveAt(listbox1.SelectedIndex);
             }
         }
 
         private void listbox1_dragdrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.Text))
+            string[] formats = new string[5] { DataFormats.Text, DataFormats.UnicodeText, DataFormats.SymbolicLink, DataFormats.Html, DataFormats.OemText};
+            foreach (string format in formats)
             {
-                string s = (string)e.Data.GetData(DataFormats.Text, false);
-                if (!listbox1.Items.Contains(s))
+                if (e.Data.GetDataPresent(format))
                 {
-                    addItem(s);
-                }
-            }
-            if (e.Data.GetDataPresent(DataFormats.UnicodeText))
-            {
-                string s = (string)e.Data.GetData(DataFormats.UnicodeText, false);
-                if (!listbox1.Items.Contains(s))
-                {
-                    addItem(s);
-                }
-            }
-            if (e.Data.GetDataPresent(DataFormats.SymbolicLink))
-            {
-                string s = (string)e.Data.GetData(DataFormats.SymbolicLink, false);
-                if (!listbox1.Items.Contains(s))
-                {
-                    addItem(s);
-                }
-            }
-            if (e.Data.GetDataPresent(DataFormats.Html))
-            {
-                string s = (string)e.Data.GetData(DataFormats.Html, false);
-                if (!listbox1.Items.Contains(s))
-                {
-                    addItem(s);
-                }
-            }
-            if (e.Data.GetDataPresent(DataFormats.OemText))
-            {
-                string s = (string)e.Data.GetData(DataFormats.OemText, false);
-                if (!listbox1.Items.Contains(s))
-                {
-                    addItem(s);
+                    string s = (string) e.Data.GetData(format, false);
+                    if (!listbox1.Items.Contains(s))
+                    {
+                        addItem(s);
+                    }
                 }
             }
         }
-
-        //Dictionary<int, ProgressBar> links_ = new Dictionary<int, ProgressBar>();
 
         public void addItem(String s)
         {
-            //listbox1.Items.Add(new { Name=s, Progress=b });
-            Video v = new Video() {Name=s, Progress=0};
-            Videos.Add(v);
-            listbox1.Items.Add(v);
-            //links_.Add(listbox1.Items.Count - 1, b);
+            if (System.Text.RegularExpressions.Regex.IsMatch(s, "^(?:https?://)?(?:www\\.)?(?:youtube\\.com|youtu\\.be)/watch\\?v=([^&]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            {
+                Video v = new Video() { Name = s, Progress = 0 };
+                foreach (Object obj in listbox1.Items)
+                {
+                    string name = (obj as Video).Name;
+                    if (v.Name == name)
+                    {
+                        return;
+                    }
+                }
+                Videos.Add(v);
+                listbox1.Items.Add(v);
+            }
+            else
+            {
+                MessageBox.Show(s + " doesn't seem to be a valid youtube link.");
+            }
         }
+
+        System.Timers.Timer timer;
 
         private void Button_Click(object sender_, RoutedEventArgs e)
         {
-            //progressbar1.Maximum = 100;
-            //progressbar1.Minimum = 0;
-            int count = listbox1.Items.Count;
-
-            for (int i = 0; i < Videos.Count; i++)
+            if (Videos.Count > 0)
             {
                 progressring1.IsActive = true;
                 label1.Visibility = System.Windows.Visibility.Visible;
-                MessageBox.Show(i.ToString());
-                Video v = null;
-                if (i != -1 && i < Videos.Count)
-                {
-                    v = Videos[i];
+                if(timer == null){
+                    timer = new System.Timers.Timer(1000);
+                    timer.Elapsed += OnTick;
                 }
-                Thread t = new Thread(() => downloadVideo(v, count, i));
+                timer.Start();
+            }
+
+            for (int i = 0; i < Videos.Count; i++)
+            {
+                Video v = Videos[i];
+                int c = i;
+                Thread t = new Thread(() => downloadVideo(v, Videos.Count, c));
                 t.Start();
             }
-               /* foreach (Video i in listbox1.Items)
-                {
-                    //string link = i;
-
-                    progressring1.IsActive = true;
-                    label1.Visibility = System.Windows.Visibility.Visible;
-
-                    Thread t = new Thread(() => downloadVideo(i, count, c));
-                    t.Start();
-
-                    c++; // C++ ô.ô
-                }*/
         }
 
+        private void OnTick(object source, ElapsedEventArgs e)
+        {
+            int g = 0;
+            foreach (Video v in Videos)
+            {
+                g += v.Progress;
+            }
+            if (Videos.Count < 1)
+            {
+                timer.Stop();
+                return;
+            }
+            double percentage = g / Videos.Count;
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                label1.Content = Math.Round(percentage) + "%";
+            }));
+        }
 
         public void downloadVideo(Video link, int count, int c)
         {
             IEnumerable<VideoInfo> videoInfos = DownloadUrlResolver.GetDownloadUrls(link.Name);
-
-            VideoInfo video = videoInfos
-            .Where(info => info.CanExtractAudio)
-            .OrderByDescending(info => info.AudioBitrate)
-            .First();
+            
+            VideoInfo video = videoInfos.Where(info => info.CanExtractAudio).OrderByDescending(info => info.AudioBitrate).First();
 
             var audioDownloader = new AudioDownloader(video, Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + "/" + video.Title + video.AudioExtension);
 
-            //audioDownloader.DownloadProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => progressbar1.Value = args.ProgressPercentage / count));
-            //audioDownloader.AudioExtractionProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => progressbar1.Value = args.ProgressPercentage * 0.15));
             audioDownloader.DownloadProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => {
-                Videos[c - 1].Progress = (int)args.ProgressPercentage;
-                label1.Content = Convert.ToString(args.ProgressPercentage) + "%";
+                if (c < Videos.Count)
+                {
+                    Videos[c].Progress = (int)Math.Round(args.ProgressPercentage);
+                }
             }));
             audioDownloader.AudioExtractionProgressChanged += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() => {
-                Videos[c - 1].Progress = (int)args.ProgressPercentage;
-                label1.Content = Convert.ToString(args.ProgressPercentage) + "%";
+                if (c < Videos.Count)
+                {
+                    Videos[c].Progress = (int)Math.Round(args.ProgressPercentage);
+                }
             }));
             audioDownloader.DownloadFinished += (sender, args) => this.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -192,21 +186,17 @@ namespace SimpleYTDownloader
                 }
             }));
 
-
             audioDownloader.Execute();
         }
 
         private void base_keydown(object sender, KeyEventArgs e)
         {
-            // ctrl + v
             if (e.Key == Key.V && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
             {
                 if (Clipboard.ContainsData(DataFormats.Text) || Clipboard.ContainsData(DataFormats.UnicodeText) || Clipboard.ContainsData(DataFormats.OemText))
                 {
                     addItem(Clipboard.GetText());
-                    //listbox1.Items.Add(Clipboard.GetText());
                 }
-
                 e.Handled = true;
             }
         }

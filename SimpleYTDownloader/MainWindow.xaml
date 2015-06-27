@@ -6,7 +6,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Orange.xaml" />
@@ -24,8 +24,8 @@
         </ListBox>-->
         <Button Content="Download All" HorizontalAlignment="Left" Margin="412,273,0,0" VerticalAlignment="Top" Width="95" Height="33" Click="Button_Click"/>
         <!--<ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Margin="-278,260,0,0" VerticalAlignment="Top" Width="232" Height="33" Value="59" Foreground="#FF8FFF08"/>-->
-        <Controls:ProgressRing x:Name="progressring1" HorizontalAlignment="Left" Margin="346,259,0,0" VerticalAlignment="Top" Height="43" Width="42" IsActive="False"/>
-        <Label x:Name="label1" Content="0%" HorizontalAlignment="Left" Margin="361,276,0,0" VerticalAlignment="Top" Visibility="hidden"/>
+        <Controls:ProgressRing x:Name="progressring1" HorizontalAlignment="Left" Margin="350,267,0,0" VerticalAlignment="Top" Height="43" Width="42" IsActive="False"/>
+        <Label x:Name="label1" Content="0%" HorizontalAlignment="Left" Margin="361,276,0,0" VerticalAlignment="Top" Visibility="hidden" />
         <ListView ItemsSource="{Binding Videos}" x:Name="listbox1" HorizontalAlignment="Left" Height="244" Margin="10,10,0,0" VerticalAlignment="Top" Width="497" Drop="listbox1_dragdrop" AllowDrop="True" Background="White" BorderThickness="0">
             <ListView.View>
                 <!--<GridView>
